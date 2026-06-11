@@ -180,18 +180,34 @@
   </div>
 
   <section class="grid-section">
-    <div class="grid">
-      <p class="empty-grid">No posts yet.</p>
+    <div class="grid" id="posts-grid">
+      <p class="empty-grid">Loading...</p>
     </div>
   </section>
 
   <script>
-    // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.dropdown-wrap')) {
         document.querySelectorAll('.dropdown-wrap.open').forEach(el => el.classList.remove('open'));
       }
     });
+
+    fetch('posts.json')
+      .then(r => r.json())
+      .then(posts => {
+        const grid = document.getElementById('posts-grid');
+        if (!posts.length) {
+          grid.innerHTML = '<p class="empty-grid">No posts yet.</p>';
+          return;
+        }
+        grid.innerHTML = posts.map(p => `
+          <a class="grid-cell" href="${p.href}" target="_blank" rel="noopener">
+            <img src="${p.img}" alt="" loading="lazy">
+          </a>`).join('');
+      })
+      .catch(() => {
+        document.getElementById('posts-grid').innerHTML = '<p class="empty-grid">No posts yet.</p>';
+      });
   </script>
 </body>
 </html>
